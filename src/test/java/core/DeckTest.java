@@ -22,6 +22,8 @@ public class DeckTest {
 		System.out.println("after shuffle");
 		
 		System.out.println(deck.toString());
+		
+		
 	}
 
 }

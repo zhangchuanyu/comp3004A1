@@ -11,7 +11,7 @@ public class HandTest {
 		Hand hand = new Hand();
 		Card card = new Card(Suit.C, Rank.A);
 		hand.addCard(card);
-		card = new Card(Suit.C, Rank.J);
+		card = new Card(Suit.C, Rank.JACK);
 		hand.addCard(card);
 		
 		Assert.assertTrue("Should be a blackjack", hand.isBackjack());	
@@ -21,9 +21,9 @@ public class HandTest {
 	@Test
 	public void testGetValue() {
 		Hand hand = new Hand();
-		Card card = new Card(Suit.C, Rank.Q);
+		Card card = new Card(Suit.C, Rank.QUEEN);
 		hand.addCard(card);
-		card = new Card(Suit.C, Rank.J);
+		card = new Card(Suit.C, Rank.JACK);
 		hand.addCard(card);
 		
 		Assert.assertEquals("Incorrect hand value", 20, hand.getValue());
@@ -44,11 +44,11 @@ public class HandTest {
 	@Test
 	public void testGetBusted() {
 		Hand hand = new Hand();
-		Card card = new Card(Suit.C, Rank.Q);
+		Card card = new Card(Suit.C, Rank.QUEEN);
 		hand.addCard(card);
-		card = new Card(Suit.C, Rank.J);
+		card = new Card(Suit.C, Rank.JACK);
 		hand.addCard(card);
-		card = new Card(Suit.C, Rank.K);
+		card = new Card(Suit.C, Rank.KING);
 		hand.addCard(card);
 		
 		Assert.assertTrue("Should be a Busted", hand.isBusted());	

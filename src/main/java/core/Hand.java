@@ -9,12 +9,15 @@ public class Hand {
 	public void addCard(Card card) {
 		cards.add(card);
 	}
+
 	public void PrintList() {
 		for(int i=0;i<cards.size();i++) {
 			System.out.println(cards.get(i));
 		}
 	}
-	
+	public void printOne() {
+		System.out.println(cards.get(0));
+	}
 	private int numOfAs() {
 		int count = 0;
 		for(int i=0;i<cards.size();i++) {

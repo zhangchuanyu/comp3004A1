@@ -9,7 +9,7 @@ public class Card {
 		this.rank = rank;
 		this.suit = suit;
 	}
-
+	
 	public String toString() {
 		return this.suit.toString() + "-" + this.rank.toString();
 	}
