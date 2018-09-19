@@ -39,7 +39,7 @@ public class Hand {
 		}
 		return total;
 	}
-	
+
 	public boolean isBusted() {
 		if (getValue() > 21) {
 			return true;

@@ -54,6 +54,15 @@ public class HandTest {
 		Assert.assertTrue("Should be a Busted", hand.isBusted());	
 		Assert.assertFalse("Should not be a blackjack", hand.isBackjack());
 	}
+	@Test
+	public void testcanDealerHit() {
+		Hand hand = new Hand();
+		Card card = new Card(Suit.D,Rank.EIGHT);
+		Card card1 = new Card(Suit.D,Rank.FOUR);
+		hand.addCard(card);
+		hand.addCard(card1);
+		Assert.assertTrue("should can hit", hand.canDealerHit());
+	}
 	
 
 }

@@ -21,14 +21,15 @@ public class Blackjack {
 	}
 
 	public void playfile() {
-		//Scanner fn = new Scanner(System.in);
+		// Scanner fn = new Scanner(System.in);
 		String str;
+		int hitagain = 0;
 		// private List<Card> cards = new ArrayList<>();
 		Hand playerHand = new Hand();
 		Hand dealerHand = new Hand();
 		// System.out.println("please enter the file name:");
 		// String FN = fn.nextLine();
-		String FN = "/tmp/file1.txt";
+		String FN = "/Users/xuyijie/Desktop/a1.txt";
 		File file = new File(FN);
 		Scanner scanner;
 		try {
@@ -40,40 +41,57 @@ public class Blackjack {
 			str = scanner.nextLine();
 			System.out.println(str);
 			String[] spStr = str.split("\\s+");
-			System.out.println(spStr[2]);
-			for (int i = 0; i < spStr.length; i++) {
-				if (i < 2) {
-					Card card1 = new Card(Suit.valueOf(spStr[0].substring(0, 1)),
-							Rank.valueOf(spStr[0].substring(1, 2)));
-					playerHand.addCard(card1);
-					Card card2 = new Card(Suit.valueOf(spStr[1].substring(0, 1)),
-							Rank.valueOf(spStr[1].substring(1, 2)));
-					playerHand.addCard(card2);
-					System.out.println("Player receives the "+ card1.getRank().getPoints()+" of the "+card1.getSuit().getName()
-							+" and "+ card2.getRank().getPoints() + " of the "+ card2.getSuit().getName());
-				} else if (i>=2 && i<4){
-					Card card3 = new Card(Suit.valueOf(spStr[2].substring(0, 1)),
-							Rank.valueOf(spStr[i].substring(1, 2)));
-					Card card4 = new Card(Suit.valueOf(spStr[3].substring(0, 1)),
-							Rank.valueOf(spStr[i].substring(1, 2)));
-					dealerHand.addCard(card3);
-					dealerHand.addCard(card4);
-					System.out.println("Dealer receives the "+ card3.getRank().getPoints()+" of the "+card3.getSuit().getName()
-							+" and "+ card4.getRank().getPoints() + " of the "+ card4.getSuit().getName());
-				}
-				else if (i==4)
-				{
-					if(spStr[i].equals('S')) {
-						System.out.println("Player Stands");
-						//dealer round.
-						if(dealerHand.canDealerHit()) {
-							System.out.println("dealer has "+ dealerHand.getValue() + " and  thus must hit it.");
-						}
-					}
-					if(spStr[i].equals('H')) {}
-					if(spStr[i].equals('D')){}
-				}
+
+			if (spStr.length < 4) {
+				System.out.println("Invalid string: " + str);
+				continue;
 			}
+
+			Card card1 = new Card(spStr[0]);
+			Card card2 = new Card(spStr[1]);
+			Card card3 = new Card(spStr[2]);
+			Card card4 = new Card(spStr[3]);
+			playerHand.addCard(card1);
+			playerHand.addCard(card2);
+			System.out.println("Player receives the " + card1.getLongName() + " and " + card2.getLongName());
+
+			dealerHand.addCard(card3);
+			dealerHand.addCard(card4);
+			System.out.println("dealer receives the " + card3.getLongName() + " and " + card4.getLongName());
+
+			for (int i = 3; i < spStr.length; i++) {
+
+				// if there are any stands.
+				if (spStr[i].equals("S")) {
+					System.out.println("Player Stands");
+					for (int j = i + 1; j < spStr.length; j++) {
+						Card card = new Card(spStr[j]);
+						if (!dealerHand.canDealerHit()) {
+							System.out.println("Dealer cannot hit. Invalid input card " + card.getLongName());
+							break;
+						}
+						System.out.println("dealer has " + dealerHand.getValue()
+								+ " and  thus must hit it, and get card " + card.getLongName());
+						dealerHand.addCard(card);
+					}
+					break;
+
+				} else if (spStr[i].equals("H")) {
+					Card card7 = new Card(spStr[i + 1]);
+					playerHand.addCard(card7);
+					i++;
+					String again = "";
+					if (hitagain > 0) {
+						again = " again ";
+					}
+					System.out.println("Player hit " + again + " and gets " + card7.getLongName() + ":Hand value is "
+							+ playerHand.getValue());
+					hitagain++;// hit again.
+				}
+
+			}
+
+			checkIfGameOver(dealerHand, playerHand, true);
 		}
 		scanner.close();
 
@@ -99,55 +117,36 @@ public class Blackjack {
 				System.out.println("Your Hand value is:" + playerHand.getValue());
 				System.out.println("the first card of dealer is :");
 				dealerHand.printOne();
-				if (isPlayerwin(dealerHand, playerHand)) {
-					System.out.println("you win!");
-					gameover = true;
-				}
+				gameover = checkIfGameOver(dealerHand, playerHand, false);
 
 				while (!gameover) {
 					System.out.println("Do you want to hit(1) or stand(2)? 1/2:?");
 					// player choose to hit.
-					if (reader.nextInt() == 1) {
+					int input = reader.nextInt();
+					switch (input) {
+					case 1:
 						playerHand.addCard(playingDeck.draw());
 						System.out.println("your hand are: ");
 						playerHand.PrintList();
 						System.out.println("your hand values are:" + playerHand.getValue());
-						if (isPlayerwin(dealerHand, playerHand)) {
-							System.out.println("you win!");
-							gameover = true;
-						} else if (isDealerwin(dealerHand, playerHand)) {
-							System.out.println("the dealer's cards are:");
-							dealerHand.PrintList();
-							System.out.println("the dealer's cards values are:" + dealerHand.getValue());
-							System.out.println("dealer win you lose.");
-							gameover = true;
-						}
-					} else if (reader.nextInt() == 2) {
+						gameover = checkIfGameOver(dealerHand, playerHand, false);
+						break;
+					case 2:
 						// dealer round
 						while (dealerHand.canDealerHit() && !gameover) {
-							System.out.println("the dealer draw:" + playingDeck.getCard(0));
-							dealerHand.addCard(playingDeck.draw());
-							if (isDealerwin(dealerHand, playerHand)) {
-								System.out.println("the dealer win!");
-								dealerHand.PrintList();
-								gameover = true;
-							} else if (isPlayerwin(dealerHand, playerHand)) {
-								System.out.println("the Player win!");
-								gameover = true;
-							}
+							Card card = playingDeck.draw();
+							System.out.println("the dealer draw:" + card);
+							dealerHand.addCard(card);
+							gameover = checkIfGameOver(dealerHand, playerHand, false);
 							System.out.println("the dealer cards value is :" + dealerHand.getValue());
 						}
 
 						if (!gameover) {
-							if (playerHand.getValue() == dealerHand.getValue()) {
-								System.out.println("push");
-							} else if (playerHand.getValue() > dealerHand.getValue()) {
-								System.out.println("you win the hand.");
-							} else {
-								System.out.println("the dealer win!");
-							}
+							gameover = checkIfGameOver(dealerHand, playerHand, true);
 						}
-						gameover = true;
+						break;
+					default:
+						System.out.println("Invalid input: " + input);
 					}
 
 				}
@@ -161,24 +160,54 @@ public class Blackjack {
 		reader.close();
 	}
 
-	public boolean isDealerwin(Hand dealerHand, Hand playerHand) {
-		if (dealerHand.isBackjack())
+	public boolean checkIfGameOver(Hand dealerHand, Hand playerHand, boolean dealerStand) {
+		if (dealerHand.isBackjack()) {
+			System.out.println("dealer blackjack wins.");
+			System.out.println("dealerHand are:");
+			dealerHand.PrintList();
 			return true;
-		else if (playerHand.isBusted())
-			return true;
-		else
-			return false;
+		}
 
-	}
-
-	public boolean isPlayerwin(Hand dealerHand, Hand playerHand) {
-		if (playerHand.isBackjack())
+		if (playerHand.isBusted()) {
+			System.out.println("dealer wins as player busted");
+			System.out.println("dealerHand are:");
+			dealerHand.PrintList();
 			return true;
-		else if (dealerHand.isBusted())
-			return true;
-		else
-			return false;
+		}
 
+		if (playerHand.isBackjack()) {
+			System.out.println("player blackjack wins");
+			System.out.println("dealerHand are:");
+			dealerHand.PrintList();
+			return true;
+		}
+
+		if (dealerHand.isBusted()) {
+			System.out.println("player wins as dealer busted.");
+			System.out.println("dealerHand are:");
+			dealerHand.PrintList();
+			
+			return true;
+		}
+
+		if (dealerStand) {
+			if (dealerHand.getValue() > playerHand.getValue()) {
+				System.out.println("dealer wins " + dealerHand.getValue() + " : " + playerHand.getValue());
+				System.out.println("dealerHand are:");
+				dealerHand.PrintList();
+			} else if (dealerHand.getValue() < playerHand.getValue()) {
+				System.out.println("player wins " + playerHand.getValue() + " : " + dealerHand.getValue());
+				System.out.println("dealerHand are:");
+				dealerHand.PrintList();
+			} else {
+				System.out.println("push " + dealerHand.getValue() + " : " + playerHand.getValue());
+				System.out.println("dealerHand are:");
+				dealerHand.PrintList();
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	public static void main(String[] args) {
