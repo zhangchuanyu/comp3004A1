@@ -9,7 +9,14 @@ public class Hand {
 	public void addCard(Card card) {
 		cards.add(card);
 	}
-
+	public void removeCard(Card card) {
+		cards.remove(card);
+	}
+	public boolean isSame() {
+		if(cards.get(0).getRank()==cards.get(1).getRank()) {return true;}
+		else return false;
+		
+	}
 	public void PrintList() {
 		for(int i=0;i<cards.size();i++) {
 			System.out.println(cards.get(i));

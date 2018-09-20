@@ -17,7 +17,15 @@ public class HandTest {
 		Assert.assertTrue("Should be a blackjack", hand.isBackjack());	
 		Assert.assertFalse("Should not be busted", hand.isBusted());
 	}
-	
+	@Test
+	public void testisSame() {
+		Hand hand = new Hand();
+		Card card = new Card(Suit.C,Rank.EIGHT);
+		hand.addCard(card);
+		card = new Card(Suit.D,Rank.EIGHT);
+		hand.addCard(card);
+		Assert.assertTrue("should be the same value",hand.isSame());
+	}
 	@Test
 	public void testGetValue() {
 		Hand hand = new Hand();

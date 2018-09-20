@@ -23,10 +23,13 @@ public class Blackjack {
 	public void playfile() {
 		// Scanner fn = new Scanner(System.in);
 		String str;
+
 		int hitagain = 0;
+		boolean isSpilt = false;
 		// private List<Card> cards = new ArrayList<>();
 		Hand playerHand = new Hand();
 		Hand dealerHand = new Hand();
+		Hand temHand = new Hand();
 		// System.out.println("please enter the file name:");
 		// String FN = fn.nextLine();
 		String FN = "/Users/xuyijie/Desktop/a1.txt";
@@ -53,16 +56,17 @@ public class Blackjack {
 			Card card4 = new Card(spStr[3]);
 			playerHand.addCard(card1);
 			playerHand.addCard(card2);
-			System.out.println("Player receives the " + card1.getLongName() + " and " + card2.getLongName());
+			System.out.println("Player receives the " + card1.getLongName() + " and " + card2.getLongName()+ ": hand value is " + playerHand.getValue());
 
 			dealerHand.addCard(card3);
 			dealerHand.addCard(card4);
-			System.out.println("dealer receives the " + card3.getLongName() + " and " + card4.getLongName());
+			System.out.println("dealer receives the " + card3.getLongName() + " and " + card4.getLongName()+": hand value is " + dealerHand.getValue());
 
 			for (int i = 3; i < spStr.length; i++) {
 
 				// if there are any stands.
-				if (spStr[i].equals("S")) {
+
+				if (spStr[i].equals("S") && !isSpilt) {
 					System.out.println("Player Stands");
 					for (int j = i + 1; j < spStr.length; j++) {
 						Card card = new Card(spStr[j]);
@@ -76,7 +80,7 @@ public class Blackjack {
 					}
 					break;
 
-				} else if (spStr[i].equals("H")) {
+				} else if (spStr[i].equals("H") && !isSpilt) {
 					Card card7 = new Card(spStr[i + 1]);
 					playerHand.addCard(card7);
 					i++;
@@ -87,16 +91,117 @@ public class Blackjack {
 					System.out.println("Player hit " + again + " and gets " + card7.getLongName() + ":Hand value is "
 							+ playerHand.getValue());
 					hitagain++;// hit again.
-				}
+				} else if (spStr[i].equals("D")) {
+					isSpilt = true;
+					playerHand.removeCard(card1);
 
+					temHand.addCard(card1);
+
+					System.out.print("player split! ");
+
+					Card card8 = new Card(spStr[i + 1]);
+
+					temHand.addCard(card8);
+
+					Card card9 = new Card(spStr[i + 2]);
+
+					playerHand.addCard(card9);
+
+					System.out.print(" gets " + card8.getLongName() + " on " + card1.getLongName() + " and get "
+							+ card9.getLongName() + " on " + card2.getLongName());
+
+					Hand hand = temHand;
+
+					int numOfStand = 0;
+
+					for (int j = i + 1; j < spStr.length; j++) {
+
+						if (spStr[j].equals("H")) {
+
+							Card card7 = new Card(spStr[j + 1]);
+
+							hand.addCard(card7);
+
+							j++;
+
+							String again = "";
+
+							if (hitagain > 0) {
+								again = " again ";
+							}
+
+							System.out.println(
+									"Player hit " + again + " and gets " + card7.getLongName() + ":Hand value is "
+
+											+ hand.getValue());
+
+							hitagain++;// hit again.
+
+						} else if (spStr[j].equals("S")) {
+
+							numOfStand++;
+
+							if (numOfStand == 1) {
+
+								hand = playerHand;
+
+							} else if (numOfStand == 2) {
+								// second stand, dealer's turn
+								hand = bestOne(temHand,playerHand);
+								for (int k = j + 1; k < spStr.length; j++) {
+
+									Card card = new Card(spStr[k]);
+
+									if (!dealerHand.canDealerHit()) {
+
+										System.out
+												.println("Dealer cannot hit. Invalid input card " + card.getLongName());
+
+										break;
+
+									}
+
+									System.out.println("dealer has " + dealerHand.getValue()
+
+											+ " and  thus must hit it, and get card " + card.getLongName());
+
+									dealerHand.addCard(card);
+
+								}
+								break;
+							}
+
+						}
+
+					}
+					checkIfGameOver(dealerHand,hand,true);
+				} 
 			}
 
-			checkIfGameOver(dealerHand, playerHand, true);
 		}
-		scanner.close();
 
+		checkIfGameOver(dealerHand, playerHand, true);
+	
+	scanner.close();
 	}
 
+	public Hand bestOne(Hand tem,Hand player) {
+		if(tem.isBusted()&&!player.isBusted()) {
+			return tem;
+		}
+		else if(! tem.isBusted() && !player.isBusted()&& player.getValue()>tem.getValue()) {
+			System.out.println("the latter hand is the best of the two of the plaer and ");
+			return player;
+		}
+		else if (player.isBusted()&&!tem.isBusted()) {
+			return tem;
+		}
+		else if(! tem.isBusted() && !player.isBusted()&& player.getValue()<tem.getValue()) {
+			System.out.println("the first hand is the best of the two of the plaer and ");
+			return player;
+		}
+		else {return player;}
+	}
 	public void playconsole() {
 		Deck playingDeck = new Deck();
 		playingDeck.shuffle();
@@ -186,7 +291,7 @@ public class Blackjack {
 			System.out.println("player wins as dealer busted.");
 			System.out.println("dealerHand are:");
 			dealerHand.PrintList();
-			
+
 			return true;
 		}
 

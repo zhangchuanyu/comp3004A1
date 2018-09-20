@@ -28,17 +28,13 @@ public class Deck {
 		Collections.shuffle(cards);
 	}
 
-	public void removeCard(int i) {
-		this.cards.remove(i);
-	}
+
 
 	public Card getCard(int i) {
 		return this.cards.get(i);
 	}
 
-	public void addCard(Card addCard) {
-		this.cards.add(addCard);
-	}
+
 
 	public Card draw() {
 		if (i > 51) {
